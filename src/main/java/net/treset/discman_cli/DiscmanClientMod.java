@@ -1,6 +1,7 @@
 package net.treset.discman_cli;
 
 import net.fabricmc.api.ModInitializer;
+import net.treset.discman_cli.networking.ConnectionManager;
 import net.treset.discman_cli.networking.DataSender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,10 +22,7 @@ public class DiscmanClientMod implements ModInitializer {
 
 		LOGGER.info("Hello Fabric world!");
 
-		try {
-			DataSender.init();
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		if(!ConnectionManager.establishConnection()) return;
+		DataSender.sendDummyData();
 	}
 }

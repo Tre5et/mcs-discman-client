@@ -8,23 +8,21 @@ import java.net.Socket;
 
 public class DataSender {
 
-    public static void init() throws IOException {
-        // Create client socket
-        Socket s = new Socket("localhost", 856);
+    public static boolean sendDummyData() {
 
-        // to send data to the server
-        DataOutputStream dos
-                = new DataOutputStream(
-                s.getOutputStream());
+        DataOutputStream dos = ConnectionManager.getServerStream();
+        if(dos == null) return false;
 
-        dos.writeBytes("test_message \n");
-        dos.writeBytes("test_message2 \n");
-        dos.writeBytes("dc");
-        dos.close();
+        try {
+            dos.writeBytes("test_message \n");
+            dos.writeBytes("test_message2 \n");
+        } catch (IOException e) {
+            return false;
+        }
 
-        s.close();
+        DiscmanClientMod.LOGGER.info("Dta snd");
 
-        DiscmanClientMod.LOGGER.info("done SENDING DATA aaaaaaaaaaaaaaaaaaaaaa");
+        return ConnectionManager.closeConnection();
     }
 
 }

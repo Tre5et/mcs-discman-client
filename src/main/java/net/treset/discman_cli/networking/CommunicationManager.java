@@ -13,29 +13,17 @@ public class CommunicationManager {
         DataOutputStream dos = ConnectionManager.getServerSender();
         if(dos == null) return false;
 
-        try {
-            dos.writeBytes("test_message \n");
-            dos.writeBytes("test_message2 \n");
-        } catch (IOException e) {
-            return false;
-        }
+        CommunicationManager.sendToServer("testStr1");
+        CommunicationManager.sendToServer("testStr2");
 
         return true;
     }
 
     public static boolean requestMessage(String message) {
-        DataOutputStream dos = ConnectionManager.getServerSender();
-        if(dos == null) return false;
-
-        try {
-            dos.writeBytes("txt/" + message + "\n");
-        } catch (IOException e) {
-            return false;
-        }
-
-        System.out.println("message sent: " + message);
-        return true;
+        return sendToServer("txt/" + message);
     }
+
+    private static boolean closeReader = false;
 
     //continuous code, only run async
     public static boolean handleData() {
@@ -44,34 +32,49 @@ public class CommunicationManager {
 
         String msg;
 
-        boolean cancel = false;
-        while(!cancel) {
+        while(!closeReader) {
             try {
                 msg = br.readLine();
             } catch (IOException e) {
                 return false;
             }
 
-            if(msg == null) continue;
+            if(msg == null || msg.isEmpty()) continue;
 
             switch(msg.substring(0, 3)) {
-                case "dcn" -> {
-                    if(msg.substring(4).equals(ConnectionManager.getSessionId())) {
-                        cancel = true;
-                    }
-                }
+                case "cls" -> ConnectionManager.respondToClosingConnection(msg.substring(4));
                 case "txt" -> printText(msg.substring(4));
+                case "acl" -> ConnectionManager.acceptClose();
                 default -> System.out.println(msg);
             }
 
 
         }
 
-        return ConnectionManager.closeConnection();
+        closeReader = false;
+
+        return true;
+    }
+
+    public static boolean requestCloseReader() {
+        closeReader = true;
+        return true;
     }
 
     public static void printText(String text) {
         DiscmanClientMod.LOGGER.info(text);
+    }
+
+    public static boolean sendToServer(String message) {
+        DataOutputStream dos = ConnectionManager.getServerSender();
+        if(dos == null) return false;
+
+        try {
+            dos.writeBytes(message + "\n");
+        } catch (IOException e) {
+            return false;
+        }
+        return true;
     }
 
 }

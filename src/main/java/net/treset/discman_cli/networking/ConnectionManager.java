@@ -43,7 +43,7 @@ public class ConnectionManager {
 
         try {
             String sid = serverReader.readLine();
-            if(!sid.substring(0,3).equals("sid") || !sid.substring(4).equals(sessionId)) {
+            if(!sid.startsWith("sid") || !sid.substring(4).equals(sessionId)) {
                 closeConnection();
                 return false;
             }
@@ -55,19 +55,71 @@ public class ConnectionManager {
         return true;
     }
 
+    private static boolean closeAccepted = false;
+    public static void acceptClose() { closeAccepted = true; }
     public static boolean closeConnection() {
-        try {
-            serverSender.writeBytes("dcn/" + sessionId);
-            serverSender.close();
-            s.close();
-        } catch (IOException e) {
+        boolean success = true;
+
+        if(CommunicationManager.sendToServer("cls/" + sessionId)) {
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+
+            if(!closeAccepted) return false;
+            closeAccepted = false;
+
+            try {
+                CommunicationManager.requestCloseReader();
+                serverSender.close();
+                serverReader.close();
+                s.close();
+            } catch (IOException e) {
+                return false;
+            }
+
+            serverSender = null;
+            serverReader = null;
+            sessionId = null;
+        }
+        else success = false;
+
+        DiscmanClientMod.LOGGER.info(success ? "Connection close" : "Connection close unsuccessfull");
+        return true;
+    }
+
+    public static boolean respondToClosingConnection(String sid) {
+        if(!sid.equals(sessionId)) {
+            CommunicationManager.sendToServer("dcl/" + sessionId);
             return false;
         }
 
-        serverSender = null;
+        boolean success = true;
+        if(CommunicationManager.sendToServer("acl/" + sessionId)) {
+            DiscmanClientMod.LOGGER.info("Connection close accepted");
+            try {
+                serverReader.close();
+                serverSender.close();
+            } catch (IOException e) {
+                success = false;
+            }
 
-        DiscmanClientMod.LOGGER.info("Conn cls");
-        return true;
+            serverReader = null;
+            serverSender = null;
+
+            try {
+                s.close();
+            } catch (IOException e) {
+                success = false;
+            }
+
+            sessionId = null;
+        } else success = false;
+
+        DiscmanClientMod.LOGGER.info(success ? "Connection closed" : "Connection closed unsuccessfully");
+
+        return success;
     }
 
 }

@@ -1,22 +1,17 @@
 package net.treset.discman_cli.mixin;
 
-import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.network.message.MessageType;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
-import net.minecraft.text.TextContent;
 import net.minecraft.text.TranslatableTextContent;
 import net.minecraft.util.registry.RegistryKey;
-import net.treset.discman_cli.DiscmanClientMod;
-import net.treset.discman_cli.networking.DataSender;
+import net.treset.discman_cli.networking.CommunicationManager;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.awt.*;
 import java.util.function.Function;
 
 @Mixin(PlayerManager.class)
@@ -27,7 +22,7 @@ public class PlayerManagerMixin {
 
         String key = ((TranslatableTextContent)message.getContent()).getKey();
         switch(key) {
-            case "multiplayer.player.joined" -> DataSender.requestMessage(message.getString());
+            case "multiplayer.player.joined" -> CommunicationManager.requestMessage(message.getString());
         }
     }
 }

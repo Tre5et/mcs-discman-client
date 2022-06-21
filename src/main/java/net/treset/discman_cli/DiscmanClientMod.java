@@ -1,12 +1,10 @@
 package net.treset.discman_cli;
 
 import net.fabricmc.api.ModInitializer;
+import net.treset.discman_cli.networking.CommunicationManager;
 import net.treset.discman_cli.networking.ConnectionManager;
-import net.treset.discman_cli.networking.DataSender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
 
 public class DiscmanClientMod implements ModInitializer {
 	// This logger is used to write text to the console and the log file.
@@ -23,6 +21,8 @@ public class DiscmanClientMod implements ModInitializer {
 		LOGGER.info("Hello Fabric world!");
 
 		if(!ConnectionManager.establishConnection()) return;
-		DataSender.sendDummyData();
+		new Thread(CommunicationManager::handleData).start();
+
+		CommunicationManager.sendDummyData();
 	}
 }

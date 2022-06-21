@@ -20,9 +20,21 @@ public class DataSender {
             return false;
         }
 
-        DiscmanClientMod.LOGGER.info("Dta snd");
+        return true;
+    }
 
-        return ConnectionManager.closeConnection();
+    public static boolean requestMessage(String message) {
+        DataOutputStream dos = ConnectionManager.getServerStream();
+        if(dos == null) return false;
+
+        try {
+            dos.writeBytes("txt/" + message + "\n");
+        } catch (IOException e) {
+            return false;
+        }
+
+        System.out.println("message sent: " + message);
+        return true;
     }
 
 }

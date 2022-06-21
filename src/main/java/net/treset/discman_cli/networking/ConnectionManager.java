@@ -42,7 +42,7 @@ public class ConnectionManager {
 
     public static boolean closeConnection() {
         try {
-            serverStream.writeBytes("dc/" + sessionId);
+            serverStream.writeBytes("dcn/" + sessionId);
             serverStream.close();
             s.close();
         } catch (IOException e) {

@@ -30,6 +30,8 @@ public class ConnectionManager {
             serverSender = new DataOutputStream(s.getOutputStream());
             serverReader = new BufferedReader(new InputStreamReader(s.getInputStream()));
         } catch (IOException e) {
+            DiscmanClientMod.LOGGER.error("Error establishing connection to server. Unable to open socket. Stacktrace:");
+            e.printStackTrace();
             return false;
         }
 
@@ -38,12 +40,15 @@ public class ConnectionManager {
         try {
             serverSender.writeBytes("sid/" + sessionId + "\n");
         } catch (IOException e) {
+            DiscmanClientMod.LOGGER.error("Error initializing connection to server. Unable to send session id. Stacktrace:");
+            e.printStackTrace();
             return false;
         }
 
         try {
             String sid = serverReader.readLine();
             if(!sid.startsWith("sid") || !sid.substring(4).equals(sessionId)) {
+                DiscmanClientMod.LOGGER.error("Error initializing connection to server. Didn't receive correct session id from sever: \"" + sid + "\". Expecting \"" + sessionId + "\". Closing connection");
                 closeConnection();
                 return false;
             }
@@ -51,7 +56,7 @@ public class ConnectionManager {
             return false;
         }
 
-        DiscmanClientMod.LOGGER.info("Conn est");
+        DiscmanClientMod.LOGGER.info("Connection established");
         return true;
     }
 

@@ -23,6 +23,10 @@ public class PlayerManagerMixin {
         String key = ((TranslatableTextContent)message.getContent()).getKey();
         switch(key) {
             case "multiplayer.player.joined" -> CommunicationManager.requestMessage(message.getString());
+            case "multiplayer.player.left" -> CommunicationManager.requestMessage(message.getString());
+            default -> {
+                if(key.startsWith("death.")) CommunicationManager.requestMessage(message.getString());
+            }
         }
     }
 }

@@ -28,7 +28,10 @@ public class CommunicationManager {
     //continuous code, only run async
     public static boolean handleData() {
         BufferedReader br = ConnectionManager.getServerReader();
-        if(br == null) return false;
+        if(br == null) {
+            DiscmanClientMod.LOGGER.warn("Not starting data handling: No server reader active.");
+            return false;
+        }
 
         String msg;
 
@@ -36,6 +39,8 @@ public class CommunicationManager {
             try {
                 msg = br.readLine();
             } catch (IOException e) {
+                DiscmanClientMod.LOGGER.warn("Error reading line from server. Stacktrace:");
+                e.printStackTrace();
                 return false;
             }
 
@@ -72,6 +77,8 @@ public class CommunicationManager {
         try {
             dos.writeBytes(message + "\n");
         } catch (IOException e) {
+            DiscmanClientMod.LOGGER.error("Unable to send message \"" + message + "\" to server. Stacktrace:");
+            e.printStackTrace();
             return false;
         }
         return true;

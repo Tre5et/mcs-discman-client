@@ -23,6 +23,10 @@ public class CommunicationManager {
         return sendToServer("txt/" + message);
     }
 
+    public static boolean requestJoin(String player) { return sendToServer("joi/" + player);}
+    public static boolean requestLeave(String player) { return sendToServer("lev/" + player); }
+    public static boolean requestDeath(String message) { return sendToServer("dth/" + message); }
+
     private static boolean closeReader = false;
 
     //continuous code, only run async

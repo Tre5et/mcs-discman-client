@@ -3,8 +3,7 @@ package net.treset.discman_cli.mixin;
 import net.minecraft.network.message.MessageType;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableTextContent;
+import net.minecraft.text.*;
 import net.minecraft.util.registry.RegistryKey;
 import net.treset.discman_cli.networking.CommunicationManager;
 import org.spongepowered.asm.mixin.Mixin;
@@ -22,10 +21,10 @@ public class PlayerManagerMixin {
 
         String key = ((TranslatableTextContent)message.getContent()).getKey();
         switch(key) {
-            case "multiplayer.player.joined" -> CommunicationManager.requestMessage(message.getString());
-            case "multiplayer.player.left" -> CommunicationManager.requestMessage(message.getString());
+            case "multiplayer.player.joined" -> CommunicationManager.requestJoin(((Text)((TranslatableTextContent)message.getContent()).getArgs()[0]).getString());
+            case "multiplayer.player.left" -> CommunicationManager.requestLeave(((Text)((TranslatableTextContent)message.getContent()).getArgs()[0]).getString());
             default -> {
-                if(key.startsWith("death.")) CommunicationManager.requestMessage(message.getString());
+                if(key.startsWith("death.")) CommunicationManager.requestDeath(message.getString());
             }
         }
     }

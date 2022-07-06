@@ -1,7 +1,9 @@
 package net.treset.discman_cli.networking;
 
 import net.treset.discman_cli.DiscmanClientMod;
+import net.treset.discman_cli.tools.RequestHandler;
 
+import javax.print.DocFlavor;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -54,6 +56,7 @@ public class CommunicationManager {
                 case "cls" -> ConnectionManager.respondToClosingConnection(msg.substring(4));
                 case "txt" -> printText(msg.substring(4));
                 case "acl" -> ConnectionManager.acceptClose();
+                case "tim" -> RequestHandler.handleTimeG(msg.substring(4));
                 default -> System.out.println(msg);
             }
 

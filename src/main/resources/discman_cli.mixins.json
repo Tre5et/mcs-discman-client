@@ -4,6 +4,7 @@
   "package": "net.treset.discman_cli.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
+    "MinecraftServerMixin",
     "PlayerManagerMixin"
   ],
   "client": [

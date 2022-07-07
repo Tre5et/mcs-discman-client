@@ -23,6 +23,5 @@ public class MinecraftServerMixin {
     @Inject(method = "startServer(Ljava/util/function/Function;)Lnet/minecraft/server/MinecraftServer;", at = @At("RETURN"))
     private static <S extends MinecraftServer> void startServer(Function<Thread, S> serverFactory, CallbackInfoReturnable<S> info) {
         MinecraftServerInstance.setInstance(info.getReturnValue());
-        System.out.println("got server");
     }
 }

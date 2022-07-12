@@ -12,4 +12,15 @@ public class MinecraftServerInstance {
         instance = newInstance;
         DiscmanClientMod.LOGGER.info("Updated server instance.");
     }
+
+    public static void waitForCloseServer() {
+        while(MinecraftServerInstance.getInstance() == null) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        MinecraftServerInstance.getInstance().stop(true);
+    }
 }

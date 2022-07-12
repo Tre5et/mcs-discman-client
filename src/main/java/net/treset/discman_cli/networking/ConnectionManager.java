@@ -1,6 +1,7 @@
 package net.treset.discman_cli.networking;
 
 import net.treset.discman_cli.DiscmanClientMod;
+import net.treset.discman_cli.config.Config;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -25,6 +26,7 @@ public class ConnectionManager {
     public static BufferedReader getServerReader() { return serverReader; }
 
     public static boolean establishConnection() {
+        port = Config.port;
         try {
             s = new Socket("localhost", port);
             serverSender = new DataOutputStream(s.getOutputStream());

@@ -25,6 +25,7 @@ public class PlayerManagerMixin {
             case "multiplayer.player.left" -> CommunicationManager.requestLeave(((Text)((TranslatableTextContent)message.getContent()).getArgs()[0]).getString());
             default -> {
                 if(key.startsWith("death.")) CommunicationManager.requestDeath(message.getString());
+                else if(key.startsWith("chat.type.advancement.")) CommunicationManager.requestAdvancement(message.getString());
             }
         }
     }

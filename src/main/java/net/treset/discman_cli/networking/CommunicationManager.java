@@ -27,6 +27,7 @@ public class CommunicationManager {
     public static boolean requestJoin(String player) { return sendToServer("joi/" + player);}
     public static boolean requestLeave(String player) { return sendToServer("lev/" + player); }
     public static boolean requestDeath(String message) { return sendToServer("dth/" + message); }
+    public static boolean requestAdvancement(String message) { return sendToServer("adv/" + message); }
 
     private static boolean closeReader = false;
 

@@ -1,9 +1,9 @@
 package net.treset.discman_cli;
 
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.minecraft.server.MinecraftServer;
+import net.treset.discman_cli.commands.CommandHandler;
 import net.treset.discman_cli.config.Config;
 import net.treset.discman_cli.networking.CommunicationManager;
 import net.treset.discman_cli.networking.ConnectionManager;
@@ -18,6 +18,10 @@ public class DiscmanClientMod implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		Config.init();
+
+		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
+			CommandHandler.registerCommands(dispatcher, environment);
+		});
 
 		if(!ConnectionManager.establishConnection()) {
 			if(Config.requireServer)

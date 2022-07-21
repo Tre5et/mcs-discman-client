@@ -1,11 +1,14 @@
 package net.treset.discman_cli.networking;
 
+import net.minecraft.server.command.CommandManager;
 import net.treset.discman_cli.DiscmanClientMod;
 import net.treset.discman_cli.tools.RequestHandler;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.net.SocketException;
+import java.util.Objects;
 
 public class CommunicationManager {
 
@@ -29,25 +32,41 @@ public class CommunicationManager {
     public static boolean requestDeath(String message) { return sendToServer("dth/" + message); }
     public static boolean requestAdvancement(String message) { return sendToServer("adv/" + message); }
 
+    private static BufferedReader br;
+    public static void updateReader() {
+        br = ConnectionManager.getServerReader();
+    }
+
     private static boolean closeReader = false;
 
     //continuous code, only run async
     public static boolean handleData() {
-        BufferedReader br = ConnectionManager.getServerReader();
-        if(br == null) {
-            DiscmanClientMod.LOGGER.warn("Not starting data handling: No server reader active.");
-            return false;
-        }
+        updateReader();
+
+        DiscmanClientMod.LOGGER.info("Opened reader.");
 
         String msg;
 
         while(!closeReader) {
+            if(br == null) {
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+                continue;
+            }
+
             try {
                 msg = br.readLine();
             } catch (IOException e) {
                 DiscmanClientMod.LOGGER.warn("Error reading line from server. Stacktrace:");
                 e.printStackTrace();
-                return false;
+                if(Objects.equals(e.getMessage(), "Connection reset")) {
+                    DiscmanClientMod.LOGGER.warn("Closing connection with id " + ConnectionManager.getSessionId() + " because server closed unexpectedly.");
+                    ConnectionManager.closeConnection(true);
+                }
+                continue;
             }
 
             if(msg == null || msg.isEmpty()) continue;

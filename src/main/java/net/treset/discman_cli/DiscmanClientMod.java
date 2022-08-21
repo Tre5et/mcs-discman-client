@@ -24,13 +24,12 @@ public class DiscmanClientMod implements ModInitializer {
 		});
 
 		if(!ConnectionManager.establishConnection()) {
-			if(Config.requireServer)
+			if(Config.requireServer) {
 				new Thread(MinecraftServerInstance::waitForCloseServer).start();
-			return;
+				return;
+			}
 		}
 		new Thread(CommunicationManager::handleData).start();
-
-		CommunicationManager.sendDummyData();
 
 		ServerLifecycleEvents.SERVER_STOPPING.register(server -> {
 			EventHandler.onServerStopping();

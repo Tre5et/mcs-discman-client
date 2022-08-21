@@ -11,18 +11,6 @@ import java.net.SocketException;
 import java.util.Objects;
 
 public class CommunicationManager {
-
-    public static boolean sendDummyData() {
-
-        DataOutputStream dos = ConnectionManager.getServerSender();
-        if(dos == null) return false;
-
-        CommunicationManager.sendToServer("testStr1");
-        CommunicationManager.sendToServer("testStr2");
-
-        return true;
-    }
-
     public static boolean requestMessage(String message) {
         return sendToServer("txt/" + message);
     }

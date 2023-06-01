@@ -1,10 +1,8 @@
 package net.treset.discman_cli.mixin;
 
-import net.minecraft.network.message.MessageType;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.*;
-import net.minecraft.util.registry.RegistryKey;
 import net.treset.discman_cli.networking.CommunicationManager;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

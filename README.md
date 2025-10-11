@@ -1,4 +1,4 @@
-# MCS-Discman Client
+# MCS-Discman Extras
 ## Description
 A fabric server mod that enables advanced functionality for [MCS-Discman](https://github.com/Tre5et/mcs-discman). Do not install this mod unless you are running MCS-Discman. It will do nothing.
 

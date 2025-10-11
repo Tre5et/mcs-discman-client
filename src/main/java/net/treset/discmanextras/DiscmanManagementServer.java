@@ -11,9 +11,9 @@ public class DiscmanManagementServer {
     public static void init(ManagementServer server) {
         managementServer = server;
         if(managementServer == null) {
-            DiscmanClientMod.LOGGER.error("Discman failed to get Management Server");
+            DiscmanExtrasMod.LOGGER.error("Discman failed to get Management Server");
         } else {
-            DiscmanClientMod.LOGGER.info("Discman Management Server initialized");
+            DiscmanExtrasMod.LOGGER.info("Discman Management Server initialized");
         }
     }
 

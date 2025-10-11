@@ -8,7 +8,10 @@
     "MinecraftDedicatedServerMixin",
     "OutgoingRpcMethodsMixin",
     "OutgoingRpcMethodBuilderMixin",
-    "ServerPlayerEntityMixin"
+    "ServerPlayerEntityMixin",
+    "MinecraftServerMixin",
+    "IncomingRpcMethodsMixin",
+    "IncomingRpcMethodBuilderMixin"
   ],
   "client": [
   ],

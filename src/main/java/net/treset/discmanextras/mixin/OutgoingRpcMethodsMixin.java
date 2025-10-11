@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(OutgoingRpcMethods.class)
 public class OutgoingRpcMethodsMixin {
     @Inject(method = "<clinit>", at = @At("TAIL"))
-    private static void initRpc(CallbackInfo ci) {
+    private static void registerOutgoingRpc(CallbackInfo ci) {
         RpcText.register();
         RpcDeath.register();
     }

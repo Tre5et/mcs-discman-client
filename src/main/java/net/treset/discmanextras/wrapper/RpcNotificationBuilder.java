@@ -10,24 +10,24 @@ import net.minecraft.util.Identifier;
 import net.treset.discmanextras.accessors.OutgoingRpcMethodBuilderAccessor;
 
 public class RpcNotificationBuilder<T> {
-    private final Codec<T> codec;
     private String name;
+    private final Codec<T> codec;
     private final RpcSchema schema;
     private Identifier identifier;
     private String description;
 
-    private RpcNotificationBuilder(Codec<T> codec, String name, RpcSchema schema) {
+    private RpcNotificationBuilder(String name, Codec<T> codec, RpcSchema schema) {
         this.codec = codec;
         this.name = name;
         this.schema = schema;
     }
 
     public static <T> RpcNotificationBuilder<T> of(Codec<T> codec, RpcSchemaEntry schema) {
-        return new RpcNotificationBuilder<>(codec, schema.name(), schema.schema());
+        return new RpcNotificationBuilder<>(schema.name(), codec, schema.schema());
     }
 
     public static <T> RpcNotificationBuilder<T> of(SchemaWrapper<T> wrapper) {
-        return new RpcNotificationBuilder<>(wrapper.getCodec(), wrapper.getName(), wrapper.getSchema());
+        return new RpcNotificationBuilder<>(wrapper.getName(), wrapper.getCodec(), wrapper.getSchema());
     }
 
     public RpcNotificationBuilder<T> identifier(String namespace, String path) {

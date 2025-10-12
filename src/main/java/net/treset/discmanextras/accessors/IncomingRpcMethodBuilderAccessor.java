@@ -6,6 +6,5 @@ import net.minecraft.util.Identifier;
 
 public interface IncomingRpcMethodBuilderAccessor<T extends IncomingRpcMethod> {
     T buildAndRegister(Registry<IncomingRpcMethod> registry, Identifier id);
-    T buildAndRegister(Identifier id);
-    T buildAndRegisterDiscman(String path);
+    T register(Identifier id);
 }

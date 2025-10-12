@@ -5,12 +5,14 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.treset.discmanextras.wrapper.RpcNotificationBuilder;
 import net.treset.discmanextras.wrapper.RpcNotificationHandler;
+import net.treset.discmanextras.wrapper.RpcRegisterable;
 import net.treset.discmanextras.wrapper.SchemaWrapper;
 
 public record RpcDeath(RpcPlayer player, RpcText message) {
     public static SchemaWrapper<RpcDeath> WRAPPER;
     public static RpcNotificationHandler<RpcDeath> HANDLER;
 
+    @RpcRegisterable
     public static void register() {
         WRAPPER = SchemaWrapper.<RpcDeath>builder("death")
                 .property("player", SchemaWrapper.PLAYER, RpcDeath::player)

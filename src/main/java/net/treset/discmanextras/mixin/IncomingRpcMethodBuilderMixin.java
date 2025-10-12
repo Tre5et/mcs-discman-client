@@ -16,12 +16,7 @@ public abstract class IncomingRpcMethodBuilderMixin<T extends IncomingRpcMethod>
     public abstract T buildAndRegister(Registry<IncomingRpcMethod> registry, Identifier id);
 
     @Override
-    public T buildAndRegister(Identifier id) {
+    public T register(Identifier id) {
         return buildAndRegister(Registries.INCOMING_RPC_METHOD, id);
-    }
-
-    @Override
-    public T buildAndRegisterDiscman(String path) {
-        return buildAndRegister(Identifier.of("discman", path));
     }
 }

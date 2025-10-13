@@ -11,12 +11,13 @@ public class RpcTime {
     @RpcRegisterable
     public static void register() {
         RpcMethodBuilder.of(SchemaWrapper.INTEGER)
-                .resultPropertyName("time")
+                .responsePropertyName("time")
                 .description("Get the in-game time of day")
                 .identifier("discman", "server/time")
                 .build(RpcTime::getTime);
 
         RpcMethodBuilder.of(SchemaWrapper.BOOLEAN)
+                .responsePropertyName("success")
                 .parameter(SchemaWrapper.INTEGER)
                 .parameterName("time")
                 .description("Set the in-game time of day")

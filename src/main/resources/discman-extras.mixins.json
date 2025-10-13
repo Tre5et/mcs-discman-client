@@ -10,8 +10,8 @@
     "OutgoingRpcMethodBuilderMixin",
     "ServerPlayerEntityMixin",
     "MinecraftServerMixin",
-    "IncomingRpcMethodsMixin",
-    "IncomingRpcMethodBuilderMixin"
+    "IncomingRpcMethodBuilderMixin",
+    "RpcSchemaMixin"
   ],
   "client": [
   ],

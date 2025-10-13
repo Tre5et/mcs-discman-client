@@ -14,14 +14,14 @@ public record RpcDeath(RpcPlayer player, RpcText message) {
 
     @RpcRegisterable
     public static void register() {
-        WRAPPER = SchemaWrapper.<RpcDeath>builder("death")
+        WRAPPER = SchemaWrapper.<RpcDeath>builder("discman", "death")
                 .property("player", SchemaWrapper.PLAYER, RpcDeath::player)
                 .property("message", RpcText.WRAPPER, RpcDeath::message)
                 .build(RpcDeath::new);
 
         HANDLER = RpcNotificationBuilder.of(WRAPPER)
-                .identifier("discman", "notification/player/death")
                 .description("Player died")
+                .identifier("discman", "notification/players/death")
                 .build();
     }
 

@@ -4,9 +4,10 @@ import com.mojang.datafixers.kinds.App;
 import com.mojang.datafixers.util.*;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.server.dedicated.management.UriUtil;
 import net.minecraft.server.dedicated.management.schema.RpcSchema;
 import net.minecraft.server.dedicated.management.schema.RpcSchemaEntry;
+import net.minecraft.util.Identifier;
+import net.treset.discmanextras.mixin.RpcSchemaMixin;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,30 +15,34 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public abstract class RecordSchemaBuilder<T> {
-    protected String name;
+    protected Identifier identifier;
 
     protected abstract List<SchemaData<T,?>> propertiesList();
 
     protected SchemaWrapper<T> buildInternal(Function<RecordCodecBuilder.Instance<T>, App<RecordCodecBuilder.Mu<T>, T>> createInstance) {
-        Codec<T> codec = RecordCodecBuilder.create(createInstance);
+        List<SchemaData<T,?>> props = propertiesList();
 
-        RpcSchema schema = RpcSchema.ofObject();
-        for(SchemaData<T,?> p : propertiesList()) {
-            schema = p.applyToSchema(schema);
+        Codec<T> codec = null;
+        RpcSchemaEntry schemaEntry = null;
+
+        if(props.stream().allMatch(p -> p.codecBuilder() != null)) {
+            codec = RecordCodecBuilder.create(createInstance);
         }
 
-        RpcSchemaEntry schemaEntry = new RpcSchemaEntry(
-                name,
-                UriUtil.createSchemasUri(name),
-                schema
-        );
+        if(props.stream().allMatch(p -> p.schema() != null)) {
+            RpcSchema schema = RpcSchema.ofObject();
+            for (SchemaData<T, ?> p : propertiesList()) {
+                schema = p.applyToSchema(schema);
+            }
+            schemaEntry = RpcSchemaMixin.registerEntry(identifier.toString(), schema);
+        }
 
         return new SchemaWrapper<>(codec, schemaEntry);
     }
 
     public static class RecordSchemaBuilder0<T> extends RecordSchemaBuilder<T> {
-        public RecordSchemaBuilder0(String name) {
-            this.name = name;
+        public RecordSchemaBuilder0(Identifier identifier) {
+            this.identifier = identifier;
         }
 
         public <T1> RecordSchemaBuilder1<T,T1> property(SchemaData<T,T1> data) {
@@ -62,7 +67,7 @@ public abstract class RecordSchemaBuilder<T> {
         private SchemaData<T,T1> p1;
 
         public RecordSchemaBuilder1(RecordSchemaBuilder0<T> builder, SchemaData<T,T1> p1) {
-            this.name = builder.name;
+            this.identifier = builder.identifier;
             this.p1 = p1;
         }
 
@@ -105,7 +110,7 @@ public abstract class RecordSchemaBuilder<T> {
         private final SchemaData<T,T2> p2;
 
         public RecordSchemaBuilder2(RecordSchemaBuilder1<T,T1> builder, SchemaData<T,T2> p2) {
-            this.name = builder.name;
+            this.identifier = builder.identifier;
             this.p1 = builder.p1;
             this.p2 = p2;
         }
@@ -150,7 +155,7 @@ public abstract class RecordSchemaBuilder<T> {
         private final SchemaData<T,T3> p3;
 
         public RecordSchemaBuilder3(RecordSchemaBuilder2<T,T1,T2> builder, SchemaData<T,T3> p3) {
-            this.name = builder.name;
+            this.identifier = builder.identifier;
             this.p1 = builder.p1;
             this.p2 = builder.p2;
             this.p3 = p3;
@@ -198,7 +203,7 @@ public abstract class RecordSchemaBuilder<T> {
         private final SchemaData<T,T4> p4;
 
         public RecordSchemaBuilder4(RecordSchemaBuilder3<T,T1,T2,T3> builder, SchemaData<T,T4> p4) {
-            this.name = builder.name;
+            this.identifier = builder.identifier;
             this.p1 = builder.p1;
             this.p2 = builder.p2;
             this.p3 = builder.p3;
@@ -249,7 +254,7 @@ public abstract class RecordSchemaBuilder<T> {
         private final SchemaData<T,T5> p5;
 
         public RecordSchemaBuilder5(RecordSchemaBuilder4<T,T1,T2,T3,T4> builder, SchemaData<T,T5> p5) {
-            this.name = builder.name;
+            this.identifier = builder.identifier;
             this.p1 = builder.p1;
             this.p2 = builder.p2;
             this.p3 = builder.p3;
@@ -303,7 +308,7 @@ public abstract class RecordSchemaBuilder<T> {
         private final SchemaData<T,T6> p6;
 
         public RecordSchemaBuilder6(RecordSchemaBuilder5<T,T1,T2,T3,T4,T5> builder, SchemaData<T,T6> p6) {
-            this.name = builder.name;
+            this.identifier = builder.identifier;
             this.p1 = builder.p1;
             this.p2 = builder.p2;
             this.p3 = builder.p3;
@@ -360,7 +365,7 @@ public abstract class RecordSchemaBuilder<T> {
         private final SchemaData<T,T7> p7;
 
         public RecordSchemaBuilder7(RecordSchemaBuilder6<T,T1,T2,T3,T4,T5,T6> builder, SchemaData<T,T7> p7) {
-            this.name = builder.name;
+            this.identifier = builder.identifier;
             this.p1 = builder.p1;
             this.p2 = builder.p2;
             this.p3 = builder.p3;
@@ -420,7 +425,7 @@ public abstract class RecordSchemaBuilder<T> {
         private final SchemaData<T,T8> p8;
 
         public RecordSchemaBuilder8(RecordSchemaBuilder7<T,T1,T2,T3,T4,T5,T6,T7> builder, SchemaData<T,T8> p8) {
-            this.name = builder.name;
+            this.identifier = builder.identifier;
             this.p1 = builder.p1;
             this.p2 = builder.p2;
             this.p3 = builder.p3;
@@ -483,7 +488,7 @@ public abstract class RecordSchemaBuilder<T> {
         private final SchemaData<T,T9> p9;
 
         public RecordSchemaBuilder9(RecordSchemaBuilder8<T,T1,T2,T3,T4,T5,T6,T7,T8> builder, SchemaData<T,T9> p9) {
-            this.name = builder.name;
+            this.identifier = builder.identifier;
             this.p1 = builder.p1;
             this.p2 = builder.p2;
             this.p3 = builder.p3;
@@ -549,7 +554,7 @@ public abstract class RecordSchemaBuilder<T> {
         private final SchemaData<T,T10> p10;
 
         public RecordSchemaBuilder10(RecordSchemaBuilder9<T,T1,T2,T3,T4,T5,T6,T7,T8,T9> builder, SchemaData<T,T10> p10) {
-            this.name = builder.name;
+            this.identifier = builder.identifier;
             this.p1 = builder.p1;
             this.p2 = builder.p2;
             this.p3 = builder.p3;
@@ -618,7 +623,7 @@ public abstract class RecordSchemaBuilder<T> {
         private final SchemaData<T,T11> p11;
 
         public RecordSchemaBuilder11(RecordSchemaBuilder10<T,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10> builder, SchemaData<T,T11> p11) {
-            this.name = builder.name;
+            this.identifier = builder.identifier;
             this.p1 = builder.p1;
             this.p2 = builder.p2;
             this.p3 = builder.p3;
@@ -690,7 +695,7 @@ public abstract class RecordSchemaBuilder<T> {
         private final SchemaData<T,T12> p12;
 
         public RecordSchemaBuilder12(RecordSchemaBuilder11<T,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11> builder, SchemaData<T,T12> p12) {
-            this.name = builder.name;
+            this.identifier = builder.identifier;
             this.p1 = builder.p1;
             this.p2 = builder.p2;
             this.p3 = builder.p3;
@@ -765,7 +770,7 @@ public abstract class RecordSchemaBuilder<T> {
         private final SchemaData<T,T13> p13;
 
         public RecordSchemaBuilder13(RecordSchemaBuilder12<T,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12> builder, SchemaData<T,T13> p13) {
-            this.name = builder.name;
+            this.identifier = builder.identifier;
             this.p1 = builder.p1;
             this.p2 = builder.p2;
             this.p3 = builder.p3;
@@ -843,7 +848,7 @@ public abstract class RecordSchemaBuilder<T> {
         private final SchemaData<T,T14> p14;
 
         public RecordSchemaBuilder14(RecordSchemaBuilder13<T,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13> builder, SchemaData<T,T14> p14) {
-            this.name = builder.name;
+            this.identifier = builder.identifier;
             this.p1 = builder.p1;
             this.p2 = builder.p2;
             this.p3 = builder.p3;
@@ -924,7 +929,7 @@ public abstract class RecordSchemaBuilder<T> {
         private final SchemaData<T,T15> p15;
 
         public RecordSchemaBuilder15(RecordSchemaBuilder14<T,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14> builder, SchemaData<T,T15> p15) {
-            this.name = builder.name;
+            this.identifier = builder.identifier;
             this.p1 = builder.p1;
             this.p2 = builder.p2;
             this.p3 = builder.p3;
@@ -1008,7 +1013,7 @@ public abstract class RecordSchemaBuilder<T> {
         private final SchemaData<T,T16> p16;
 
         public RecordSchemaBuilder16(RecordSchemaBuilder15<T,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15> builder, SchemaData<T,T16> p16) {
-            this.name = builder.name;
+            this.identifier = builder.identifier;
             this.p1 = builder.p1;
             this.p2 = builder.p2;
             this.p3 = builder.p3;

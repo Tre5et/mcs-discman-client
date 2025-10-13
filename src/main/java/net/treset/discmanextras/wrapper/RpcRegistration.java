@@ -41,7 +41,5 @@ public class RpcRegistration {
                 throw new IllegalStateException("Error in RPC registering method " + m.getDeclaringClass().getName() + "$" + m.getName(), e);
             }
         });
-
-        System.exit(0);
     }
 }

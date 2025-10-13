@@ -13,11 +13,11 @@ public record SchemaData<T,A>(
         RpcSchema schema
 ) {
     public RpcSchema applyToSchema(RpcSchema schema) {
-        return schema.withProperty(name, schema);
+        return schema.withProperty(name, this.schema);
     }
 
     public static <T,A> SchemaData<T,A> of(String name, Codec<A> codec, RpcSchema schema, Function<T,A> getter) {
-        return new SchemaData<>(name, codec.fieldOf(name).forGetter(getter), schema);
+        return new SchemaData<>(name, codec == null ? null : codec.fieldOf(name).forGetter(getter), schema);
     }
 
     public static <T,A> SchemaData<T,A> of(String name, SchemaWrapper<A> wrapper, Function<T,A> getter) {
@@ -25,7 +25,7 @@ public record SchemaData<T,A>(
     }
 
     public static <T,A> SchemaData<T,Optional<A>> ofOptional(String name, Codec<A> codec, RpcSchema schema, Function<T, Optional<A>> getter) {
-        return new SchemaData<>(name, codec.optionalFieldOf(name).forGetter(getter), schema);
+        return new SchemaData<>(name, codec == null ? null : codec.optionalFieldOf(name).forGetter(getter), schema);
     }
 
     public static <T,A> SchemaData<T,Optional<A>> ofOptional(String name, SchemaWrapper<A> wrapper, Function<T,Optional<A>> getter) {

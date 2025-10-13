@@ -14,7 +14,7 @@ public record RpcText(String literal, Optional<String> key, Optional<List<RpcTex
 
     @RpcRegisterable(priority = 1)
     public static void register() {
-        WRAPPER = SchemaWrapper.recursive("text", (b,s) -> b
+        WRAPPER = SchemaWrapper.recursive("discman", "text", (b,s) -> b
                 .property("literal", SchemaWrapper.STRING, RpcText::literal)
                 .optionalProperty("key", SchemaWrapper.STRING, RpcText::key)
                 .optionalProperty("args", s.asList(), RpcText::args)

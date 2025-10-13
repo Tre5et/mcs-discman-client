@@ -11,7 +11,8 @@
     "ServerPlayerEntityMixin",
     "MinecraftServerMixin",
     "IncomingRpcMethodBuilderMixin",
-    "RpcSchemaMixin"
+    "RpcSchemaMixin",
+    "AdvancementFrameMixin"
   ],
   "client": [
   ],

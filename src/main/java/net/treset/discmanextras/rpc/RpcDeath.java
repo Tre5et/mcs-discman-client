@@ -10,7 +10,7 @@ import net.treset.discmanextras.wrapper.SchemaWrapper;
 
 public record RpcDeath(RpcPlayer player, RpcText message) {
     public static SchemaWrapper<RpcDeath> WRAPPER;
-    public static RpcNotificationHandler<RpcDeath> HANDLER;
+    private static RpcNotificationHandler<RpcDeath> HANDLER;
 
     @RpcRegisterable
     public static void register() {

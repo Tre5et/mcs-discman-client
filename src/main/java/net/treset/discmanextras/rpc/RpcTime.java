@@ -4,12 +4,12 @@ import net.minecraft.server.dedicated.management.dispatch.ManagementHandlerDispa
 import net.minecraft.server.dedicated.management.network.ManagementConnectionId;
 import net.treset.discmanextras.DiscmanExtrasMod;
 import net.treset.discmanextras.wrapper.RpcMethodBuilder;
-import net.treset.discmanextras.wrapper.RpcRegisterable;
+import net.treset.discmanextras.wrapper.ServerManagementInitialized;
 import net.treset.discmanextras.wrapper.SchemaWrapper;
 
+@ServerManagementInitialized
 public class RpcTime {
-    @RpcRegisterable
-    public static void register() {
+    static {
         RpcMethodBuilder.of(SchemaWrapper.INTEGER)
                 .responsePropertyName("time")
                 .description("Get the in-game time of day")

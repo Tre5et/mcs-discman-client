@@ -6,40 +6,34 @@ import org.reflections.scanners.Scanners;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class RpcRegistration {
     public static void applyRegister() {
         Reflections reflections = new Reflections(new ConfigurationBuilder()
                 .setUrls(ClasspathHelper.forPackage(""))
-                .setScanners(Scanners.MethodsAnnotated));
+                .setScanners(Scanners.TypesAnnotated));
 
-        Set<Method> res = reflections
-                .getMethodsAnnotatedWith(RpcRegisterable.class);
-        List<Method> methods = res.stream()
-                .map(method -> Map.entry(method.getAnnotation(RpcRegisterable.class).priority(), method))
+        Set<Class<?>> res1 = reflections
+                .getTypesAnnotatedWith(ServerManagementInitialized.class);
+        List<Class<?>> classes = res1.stream()
+                .map(clazz -> Map.entry(clazz.getAnnotation(ServerManagementInitialized.class).priority(), clazz))
                 .sorted((e1,e2) -> e2.getKey() - e1.getKey())
                 .map(Map.Entry::getValue)
-                .toList();
+                .collect(Collectors.toList());
 
-        methods.forEach(m -> {
-            if(!Modifier.isPublic(m.getModifiers())) {
-                throw new IllegalStateException("RPC registering methods must be public: " + m.getDeclaringClass().getName() + "$" + m.getName());
-            }
-            if(!Modifier.isStatic(m.getModifiers())) {
-                throw new IllegalStateException("RPC registering methods must be static: " + m.getDeclaringClass().getName() + "$" + m.getName());
-            }
-            if(m.getParameterCount() > 0) {
-                throw new IllegalStateException("RPC registering method has parameters: " + m.getDeclaringClass().getName() + "$" + m.getName());
-            }
+        classes.forEach(c -> {
             try {
-                m.invoke(m.getName());
-                DiscmanExtrasMod.LOGGER.info("Registered RPC Method: " + m.getDeclaringClass().getSimpleName() + "$" + m.getName() + "()");
-            } catch (Exception e) {
-                throw new IllegalStateException("Error in RPC registering method " + m.getDeclaringClass().getName() + "$" + m.getName(), e);
+                // Initialize static final fields and call static constructor
+                Class.forName(c.getName());
+            } catch (ClassNotFoundException e) {
+                throw new IllegalStateException("Failed to find RPC class: " + c.getName(), e);
+            } catch (ExceptionInInitializerError e) {
+                throw new IllegalStateException("Failed to initialize RPC class: " + c.getName(), e);
             }
+
+            DiscmanExtrasMod.LOGGER.info("Registered RPC class: {}", c.getSimpleName());
         });
     }
 }

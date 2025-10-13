@@ -2,25 +2,21 @@ package net.treset.discmanextras.rpc;
 
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableTextContent;
-import net.treset.discmanextras.wrapper.RpcRegisterable;
+import net.treset.discmanextras.wrapper.ServerManagementInitialized;
 import net.treset.discmanextras.wrapper.SchemaWrapper;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+@ServerManagementInitialized(priority = 1)
 public record RpcText(String literal, Optional<String> key, Optional<List<RpcText>> args) {
-    public static SchemaWrapper<RpcText> WRAPPER;
-
-    @RpcRegisterable(priority = 1)
-    public static void register() {
-        WRAPPER = SchemaWrapper.recursive("discman", "text", (b,s) -> b
-                .property("literal", SchemaWrapper.STRING, RpcText::literal)
-                .optionalProperty("key", SchemaWrapper.STRING, RpcText::key)
-                .optionalProperty("args", s.asList(), RpcText::args)
-                .build(RpcText::new)
-        );
-    }
+    public static final SchemaWrapper<RpcText> WRAPPER = SchemaWrapper.recursive("discman", "text", (b,s) -> b
+        .property("literal", SchemaWrapper.STRING, RpcText::literal)
+        .optionalProperty("key", SchemaWrapper.STRING, RpcText::key)
+            .optionalProperty("args", s.asList(), RpcText::args)
+        .build(RpcText::new)
+    );
 
     public static RpcText of(Text message) {
         if(message.getContent() instanceof TranslatableTextContent content) {

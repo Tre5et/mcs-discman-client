@@ -1,14 +1,13 @@
 package net.treset.discmanextras.rpc;
 
+import dev.treset.servermanagementextender.wrapper.ManagementSchema;
+import dev.treset.servermanagementextender.wrapper.RpcNotificationHandler;
+import dev.treset.servermanagementextender.wrapper.ServerManagementInitialized;
 import net.minecraft.advancement.AdvancementDisplay;
 import net.minecraft.advancement.AdvancementEntry;
 import net.minecraft.server.dedicated.management.RpcPlayer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
-import net.treset.discmanextras.wrapper.RpcNotificationBuilder;
-import net.treset.discmanextras.wrapper.RpcNotificationHandler;
-import net.treset.discmanextras.wrapper.ServerManagementInitialized;
-import net.treset.discmanextras.wrapper.SchemaWrapper;
 
 @ServerManagementInitialized
 public record RpcAdvancement(
@@ -20,17 +19,17 @@ public record RpcAdvancement(
         RpcText toast,
         Integer color
 ) {
-    public static final SchemaWrapper<RpcAdvancement> WRAPPER = SchemaWrapper.<RpcAdvancement>builder("discman", "advancement")
-            .property("player", SchemaWrapper.PLAYER, RpcAdvancement::player)
+    public static final ManagementSchema<RpcAdvancement> WRAPPER = ManagementSchema.<RpcAdvancement>builder("discman", "advancement")
+            .property("player", ManagementSchema.PLAYER, RpcAdvancement::player)
             .property("message", RpcText.WRAPPER, RpcAdvancement::message)
-            .property("identifier", SchemaWrapper.STRING, RpcAdvancement::identifier)
+            .property("identifier", ManagementSchema.STRING, RpcAdvancement::identifier)
             .property("title", RpcText.WRAPPER, RpcAdvancement::title)
             .property("description", RpcText.WRAPPER, RpcAdvancement::description)
             .property("toast", RpcText.WRAPPER, RpcAdvancement::toast)
-            .property("color", SchemaWrapper.INTEGER, RpcAdvancement::color)
+            .property("color", ManagementSchema.INTEGER, RpcAdvancement::color)
             .build(RpcAdvancement::new);
 
-    private static final RpcNotificationHandler<RpcAdvancement> HANDLER = RpcNotificationBuilder.of(WRAPPER)
+    private static final RpcNotificationHandler<RpcAdvancement> HANDLER = RpcNotificationHandler.builder(WRAPPER)
             .description("Player got an advancement")
             .identifier("discman", "notification/players/advancement")
             .build();

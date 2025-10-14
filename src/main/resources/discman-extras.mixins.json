@@ -4,15 +4,9 @@
   "package": "net.treset.discmanextras.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "ManagementServerMixin",
-    "MinecraftDedicatedServerMixin",
-    "OutgoingRpcMethodsMixin",
-    "OutgoingRpcMethodBuilderMixin",
-    "ServerPlayerEntityMixin",
-    "MinecraftServerMixin",
-    "IncomingRpcMethodBuilderMixin",
-    "RpcSchemaMixin",
-    "AdvancementFrameMixin"
+      "AdvancementFrameMixin",
+      "MinecraftServerMixin",
+      "ServerPlayerEntityMixin"
   ],
   "client": [
   ],

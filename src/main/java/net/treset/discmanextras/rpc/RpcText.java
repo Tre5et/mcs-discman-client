@@ -9,7 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-@ServerManagementInitialized(priority = 1)
+@ServerManagementInitialized
 public record RpcText(String literal, Optional<String> key, Optional<List<RpcText>> args) {
     public static final ManagementSchema<RpcText> WRAPPER = ManagementSchema.recursive("discman", "text", (b, s) -> b
         .property("literal", ManagementSchema.STRING, RpcText::literal)

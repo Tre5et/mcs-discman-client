@@ -16,14 +16,16 @@ import net.minecraft.util.math.Vec3d;
 import net.treset.discmanextras.DiscmanExtrasMod;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Optional;
+
 @ServerManagementInitialized
 public record RpcCommand(
         RpcText message,
-        Boolean success
+        Optional<Boolean> success
 ) {
     public static ManagementSchema<RpcCommand> SCHEMA = ManagementSchema.<RpcCommand>builder("discman", "command")
             .property("message", RpcText.WRAPPER, RpcCommand::message)
-            .property("success", ManagementSchema.BOOLEAN, RpcCommand::success)
+            .optionalProperty("success", ManagementSchema.BOOLEAN, RpcCommand::success)
             .build(RpcCommand::new);
 
     static {
@@ -61,17 +63,17 @@ public record RpcCommand(
             }
         }
         if(output.getResponse() == null) {
-            return RpcCommand.failureResponse("Failed to get command response.");
+            return RpcCommand.response("No command response", null);
         }
         return RpcCommand.response(output.getResponse(), !output.isError());
     }
 
-    public static RpcCommand response(Text message, boolean success) {
-        return new RpcCommand(RpcText.of(message), success);
+    public static RpcCommand response(Text message, Boolean success) {
+        return new RpcCommand(RpcText.of(message), success == null ? Optional.empty() : Optional.of(success));
     }
 
-    public static RpcCommand failureResponse(String message) {
-        return new RpcCommand(RpcText.ofString(message), false);
+    public static RpcCommand response(String message, Boolean success) {
+        return new RpcCommand(RpcText.ofString(message), success == null ? Optional.empty() : Optional.of(success));
     }
 
     private static class DiscmanCommandOutput implements CommandOutput {

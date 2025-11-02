@@ -3,6 +3,7 @@ package net.treset.discmanextras.rpc;
 import dev.treset.servermanagementextender.wrapper.ManagementSchema;
 import dev.treset.servermanagementextender.wrapper.RpcMethodBuilder;
 import dev.treset.servermanagementextender.wrapper.ServerManagementInitialized;
+import dev.treset.servermanagementextender.wrapper.enumeration.EnumTransformer;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.CommandOutput;
@@ -16,16 +17,14 @@ import net.minecraft.util.math.Vec3d;
 import net.treset.discmanextras.DiscmanExtrasMod;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Optional;
-
 @ServerManagementInitialized
 public record RpcCommand(
         RpcText message,
-        Optional<Boolean> success
+        CommandStatus status
 ) {
     public static ManagementSchema<RpcCommand> SCHEMA = ManagementSchema.<RpcCommand>builder("discman", "command")
             .property("message", RpcText.WRAPPER, RpcCommand::message)
-            .optionalProperty("success", ManagementSchema.BOOLEAN, RpcCommand::success)
+            .property("status", ManagementSchema.ofEnum(CommandStatus.class, EnumTransformer.snakeCaseLower()), RpcCommand::status)
             .build(RpcCommand::new);
 
     static {
@@ -56,24 +55,24 @@ public record RpcCommand(
         synchronized (output.getResponseLock()) {
             if(output.getResponse() == null) {
                 try {
-                    output.getResponseLock().wait(2000);
+                    output.getResponseLock().wait(1000);
                 } catch (InterruptedException e) {
                     DiscmanExtrasMod.LOGGER.warn("Waiting for command response failed", e);
                 }
             }
         }
         if(output.getResponse() == null) {
-            return RpcCommand.response("No command response", null);
+            return RpcCommand.response("No command response", CommandStatus.NO_RESPONSE);
         }
-        return RpcCommand.response(output.getResponse(), !output.isError());
+        return RpcCommand.response(output.getResponse(), output.isError() ? CommandStatus.FAILURE : CommandStatus.SUCCESS);
     }
 
-    public static RpcCommand response(Text message, Boolean success) {
-        return new RpcCommand(RpcText.of(message), success == null ? Optional.empty() : Optional.of(success));
+    private static RpcCommand response(Text message, CommandStatus status) {
+        return new RpcCommand(RpcText.of(message), status);
     }
 
-    public static RpcCommand response(String message, Boolean success) {
-        return new RpcCommand(RpcText.ofString(message), success == null ? Optional.empty() : Optional.of(success));
+    private static RpcCommand response(String message, CommandStatus status) {
+        return new RpcCommand(RpcText.ofString(message), status);
     }
 
     private static class DiscmanCommandOutput implements CommandOutput {
@@ -135,5 +134,11 @@ public record RpcCommand(
             output.setError();
             super.sendError(message);
         }
+    }
+
+    private enum CommandStatus {
+        SUCCESS,
+        FAILURE,
+        NO_RESPONSE
     }
 }

@@ -1,9 +1,11 @@
 package net.treset.discmanextras.rpc;
 
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import dev.treset.servermanagementextender.wrapper.ManagementSchema;
 import dev.treset.servermanagementextender.wrapper.RpcMethodBuilder;
 import dev.treset.servermanagementextender.wrapper.ServerManagementInitialized;
 import dev.treset.servermanagementextender.wrapper.enumeration.EnumTransformer;
+import net.minecraft.command.permission.PermissionPredicate;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.CommandOutput;
@@ -38,20 +40,24 @@ public record RpcCommand(
 
     public static RpcCommand runCommand(ManagementHandlerDispatcher dispatcher, String command, ManagementConnectionId remote) {
         DiscmanCommandOutput output = new DiscmanCommandOutput();
-        DiscmanExtrasMod.getServerInstance().getCommandManager().executeWithPrefix(
-                new DiscmanCommandSource(
-                        output,
-                        DiscmanExtrasMod.getServerInstance().getSpawnWorld() == null ? Vec3d.ZERO : Vec3d.of(DiscmanExtrasMod.getServerInstance().getSpawnPoint().getPos()),
-                        Vec2f.ZERO,
-                        DiscmanExtrasMod.getServerInstance().getSpawnWorld(),
-                        4,
-                        "Discman",
-                        Text.literal("Discman"),
-                        DiscmanExtrasMod.getServerInstance(),
-                        null
-                ),
-                command
-        );
+        try {
+            DiscmanExtrasMod.getServerInstance().getCommandSource().getDispatcher().execute(
+                    command,
+                    new DiscmanCommandSource(
+                            output,
+                            DiscmanExtrasMod.getServerInstance().getSpawnWorld() == null ? Vec3d.ZERO : Vec3d.of(DiscmanExtrasMod.getServerInstance().getSpawnPoint().getPos()),
+                            Vec2f.ZERO,
+                            DiscmanExtrasMod.getServerInstance().getSpawnWorld(),
+                            PermissionPredicate.ALL,
+                            "Discman",
+                            Text.literal("Discman"),
+                            DiscmanExtrasMod.getServerInstance(),
+                            null
+                    )
+            );
+        } catch (CommandSyntaxException e) {
+            return RpcCommand.response(e.getMessage(), CommandStatus.FAILURE);
+        }
         synchronized (output.getResponseLock()) {
             if(output.getResponse() == null) {
                 try {
@@ -124,8 +130,8 @@ public record RpcCommand(
     private static class DiscmanCommandSource extends ServerCommandSource {
         private final DiscmanCommandOutput output;
 
-        public DiscmanCommandSource(DiscmanCommandOutput output, Vec3d pos, Vec2f rot, ServerWorld world, int level, String name, Text displayName, MinecraftServer server, @Nullable Entity entity) {
-            super(output, pos, rot, world, level, name, displayName, server, entity);
+        public DiscmanCommandSource(DiscmanCommandOutput output, Vec3d pos, Vec2f rot, ServerWorld world, PermissionPredicate permission, String name, Text displayName, MinecraftServer server, @Nullable Entity entity) {
+            super(output, pos, rot, world, permission, name, displayName, server, entity);
             this.output = output;
         }
 

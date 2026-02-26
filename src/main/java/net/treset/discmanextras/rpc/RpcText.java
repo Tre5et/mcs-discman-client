@@ -14,7 +14,7 @@ public record RpcText(String literal, Optional<String> key, Optional<List<RpcTex
     public static final ManagementSchema<RpcText> WRAPPER = ManagementSchema.recursive("discman", "text", (b, s) -> b
         .property("literal", ManagementSchema.STRING, RpcText::literal)
         .optionalProperty("key", ManagementSchema.STRING, RpcText::key)
-            .optionalProperty("args", s.asList(), RpcText::args)
+        .optionalProperty("args", s.asList(), RpcText::args)
         .build(RpcText::new)
     );
 

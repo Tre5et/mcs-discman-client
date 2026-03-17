@@ -5,19 +5,20 @@ import dev.treset.servermanagementextender.wrapper.ManagementSchema;
 import dev.treset.servermanagementextender.wrapper.RpcMethodBuilder;
 import dev.treset.servermanagementextender.wrapper.ServerManagementInitialized;
 import dev.treset.servermanagementextender.wrapper.enumeration.EnumTransformer;
-import net.minecraft.command.permission.PermissionPredicate;
-import net.minecraft.entity.Entity;
+import net.minecraft.commands.CommandSource;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.command.CommandOutput;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.dedicated.management.dispatch.ManagementHandlerDispatcher;
-import net.minecraft.server.dedicated.management.network.ManagementConnectionId;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.Vec2f;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.server.jsonrpc.internalapi.MinecraftApi;
+import net.minecraft.server.jsonrpc.methods.ClientInfo;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.permissions.PermissionSet;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.phys.Vec2;
+import net.minecraft.world.phys.Vec3;
 import net.treset.discmanextras.DiscmanExtrasMod;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 
 @ServerManagementInitialized
 public record RpcCommand(
@@ -38,19 +39,19 @@ public record RpcCommand(
                 .build(RpcCommand::runCommand);
     }
 
-    public static RpcCommand runCommand(ManagementHandlerDispatcher dispatcher, String command, ManagementConnectionId remote) {
+    public static RpcCommand runCommand(MinecraftApi dispatcher, String command, ClientInfo remote) {
         DiscmanCommandOutput output = new DiscmanCommandOutput();
         try {
-            DiscmanExtrasMod.getServerInstance().getCommandSource().getDispatcher().execute(
+            DiscmanExtrasMod.getServerInstance().getCommands().getDispatcher().execute(
                     command,
                     new DiscmanCommandSource(
                             output,
-                            DiscmanExtrasMod.getServerInstance().getSpawnWorld() == null ? Vec3d.ZERO : Vec3d.of(DiscmanExtrasMod.getServerInstance().getSpawnPoint().getPos()),
-                            Vec2f.ZERO,
-                            DiscmanExtrasMod.getServerInstance().getSpawnWorld(),
-                            PermissionPredicate.ALL,
+                            Vec3.atCenterOf(DiscmanExtrasMod.getServerInstance().getRespawnData().pos()),
+                            Vec2.ZERO,
+                            DiscmanExtrasMod.getServerInstance().overworld(),
+                            PermissionSet.ALL_PERMISSIONS,
                             "Discman",
-                            Text.literal("Discman"),
+                            Component.literal("Discman"),
                             DiscmanExtrasMod.getServerInstance(),
                             null
                     )
@@ -73,7 +74,7 @@ public record RpcCommand(
         return RpcCommand.response(output.getResponse(), output.isError() ? CommandStatus.FAILURE : CommandStatus.SUCCESS);
     }
 
-    private static RpcCommand response(Text message, CommandStatus status) {
+    private static RpcCommand response(Component message, CommandStatus status) {
         return new RpcCommand(RpcText.of(message), status);
     }
 
@@ -81,16 +82,16 @@ public record RpcCommand(
         return new RpcCommand(RpcText.ofString(message), status);
     }
 
-    private static class DiscmanCommandOutput implements CommandOutput {
+    private static class DiscmanCommandOutput implements CommandSource {
         private final Object responseLock = new Object();
         private boolean error = false;
-        private Text response = null;
+        private Component response = null;
 
         public Object getResponseLock() {
             return responseLock;
         }
 
-        public Text getResponse() {
+        public Component getResponse() {
             return response;
         }
 
@@ -99,27 +100,27 @@ public record RpcCommand(
         }
 
         @Override
-        public void sendMessage(Text message) {
+        public void sendSystemMessage(@NonNull Component message) {
             synchronized (responseLock) {
                 this.response = message;
                 responseLock.notify();
             }
-            DiscmanExtrasMod.getServerInstance().sendMessage(message);
+            DiscmanExtrasMod.getServerInstance().sendSystemMessage(message);
         }
 
         @Override
-        public boolean shouldReceiveFeedback() {
-            return DiscmanExtrasMod.getServerInstance().shouldReceiveFeedback();
+        public boolean acceptsSuccess() {
+            return DiscmanExtrasMod.getServerInstance().acceptsSuccess();
         }
 
         @Override
-        public boolean shouldTrackOutput() {
-            return true;
+        public boolean acceptsFailure() {
+            return DiscmanExtrasMod.getServerInstance().acceptsFailure();
         }
 
         @Override
-        public boolean shouldBroadcastConsoleToOps() {
-            return DiscmanExtrasMod.getServerInstance().shouldBroadcastConsoleToOps();
+        public boolean shouldInformAdmins() {
+            return DiscmanExtrasMod.getServerInstance().shouldInformAdmins();
         }
 
         public void setError() {
@@ -127,18 +128,18 @@ public record RpcCommand(
         }
     }
 
-    private static class DiscmanCommandSource extends ServerCommandSource {
+    private static class DiscmanCommandSource extends CommandSourceStack {
         private final DiscmanCommandOutput output;
 
-        public DiscmanCommandSource(DiscmanCommandOutput output, Vec3d pos, Vec2f rot, ServerWorld world, PermissionPredicate permission, String name, Text displayName, MinecraftServer server, @Nullable Entity entity) {
+        public DiscmanCommandSource(DiscmanCommandOutput output, Vec3 pos, Vec2 rot, ServerLevel world, PermissionSet permission, String name, Component displayName, MinecraftServer server, @Nullable Entity entity) {
             super(output, pos, rot, world, permission, name, displayName, server, entity);
             this.output = output;
         }
 
         @Override
-        public void sendError(Text message) {
+        public void sendFailure(@NonNull Component message) {
             output.setError();
-            super.sendError(message);
+            super.sendFailure(message);
         }
     }
 

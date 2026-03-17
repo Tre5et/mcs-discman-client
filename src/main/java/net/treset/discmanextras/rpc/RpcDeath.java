@@ -3,12 +3,12 @@ package net.treset.discmanextras.rpc;
 import dev.treset.servermanagementextender.wrapper.ManagementSchema;
 import dev.treset.servermanagementextender.wrapper.RpcNotificationHandler;
 import dev.treset.servermanagementextender.wrapper.ServerManagementInitialized;
-import net.minecraft.server.dedicated.management.RpcPlayer;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.jsonrpc.api.PlayerDto;
+import net.minecraft.server.level.ServerPlayer;
 
 @ServerManagementInitialized
-public record RpcDeath(RpcPlayer player, RpcText message) {
+public record RpcDeath(PlayerDto player, RpcText message) {
     public static final ManagementSchema<RpcDeath> WRAPPER = ManagementSchema.<RpcDeath>builder("discman", "death")
             .property("player", ManagementSchema.PLAYER, RpcDeath::player)
             .property("message", RpcText.WRAPPER, RpcDeath::message)
@@ -19,14 +19,14 @@ public record RpcDeath(RpcPlayer player, RpcText message) {
             .identifier("discman", "notification/players/death")
             .build();
 
-    public static RpcDeath of(ServerPlayerEntity player, Text message) {
+    public static RpcDeath of(ServerPlayer player, Component message) {
         return new RpcDeath(
-                RpcPlayer.of(player),
+                PlayerDto.from(player),
                 RpcText.of(message)
         );
     }
 
-    public static void handle(ServerPlayerEntity player, Text message) {
+    public static void handle(ServerPlayer player, Component message) {
         HANDLER.send(RpcDeath.of(player, message));
     }
 }

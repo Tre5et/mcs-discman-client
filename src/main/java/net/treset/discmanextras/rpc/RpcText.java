@@ -2,8 +2,8 @@ package net.treset.discmanextras.rpc;
 
 import dev.treset.servermanagementextender.wrapper.ManagementSchema;
 import dev.treset.servermanagementextender.wrapper.ServerManagementInitialized;
-import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableTextContent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.contents.TranslatableContents;
 
 import java.util.Arrays;
 import java.util.List;
@@ -18,20 +18,20 @@ public record RpcText(String literal, Optional<String> key, Optional<List<RpcTex
         .build(RpcText::new)
     );
 
-    public static RpcText of(Text message) {
-        if(message.getContent() instanceof TranslatableTextContent content) {
+    public static RpcText of(Component message) {
+        if(message.getContents() instanceof TranslatableContents content) {
             return ofTranslatable(message, content);
         }
         return ofString(message.getString());
     }
 
-    public static RpcText ofTranslatable(Text message, TranslatableTextContent content) {
+    public static RpcText ofTranslatable(Component message, TranslatableContents content) {
         List<RpcText> arguments = Arrays.stream(content.getArgs())
                 .map(a -> {
-                    if(a instanceof Text t) {
+                    if(a instanceof Component t) {
                         return t;
                     }
-                    return Text.literal(a.toString());
+                    return Component.literal(a.toString());
                 }).map(RpcText::of)
                 .toList();
 

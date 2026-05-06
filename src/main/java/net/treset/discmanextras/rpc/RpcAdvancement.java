@@ -1,7 +1,7 @@
 package net.treset.discmanextras.rpc;
 
 import dev.treset.servermanagementextender.wrapper.ManagementSchema;
-import dev.treset.servermanagementextender.wrapper.RpcNotificationHandler;
+import dev.treset.servermanagementextender.wrapper.RpcOutgoingHandler;
 import dev.treset.servermanagementextender.wrapper.ServerManagementInitialized;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.advancements.DisplayInfo;
@@ -29,7 +29,7 @@ public record RpcAdvancement(
             .property("color", ManagementSchema.INTEGER, RpcAdvancement::color)
             .build(RpcAdvancement::new);
 
-    private static final RpcNotificationHandler<RpcAdvancement> HANDLER = RpcNotificationHandler.builder(WRAPPER)
+    private static final RpcOutgoingHandler.RpcResponselessOutgoingHandler<RpcAdvancement> HANDLER = RpcOutgoingHandler.builder(WRAPPER)
             .description("Player got an advancement")
             .identifier("discman", "notification/players/advancement")
             .build();

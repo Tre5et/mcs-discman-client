@@ -104,7 +104,7 @@ public record RpcCommandArgument(
             LiteralArgumentBuilder<CommandSourceStack> builder = Commands.literal(command.name());
             if(command.children().isPresent()) {
                 for (RpcCommandArgument argument : command.children().get()) {
-                    argument.build(builder, List.of(new CommandSetArgument<Void>(command.name(), Optional.empty())), RpcCommandArgument::send);
+                    argument.build(builder, List.of(new CommandSetArgument<Void>(command.name(), Optional.empty())), RpcCommandArgument::execute);
                 }
             }
             DiscmanExtrasMod.dispatcher.register(builder);
@@ -114,14 +114,23 @@ public record RpcCommandArgument(
         return true;
     }
 
-    private static Integer send(CommandContext<CommandSourceStack> ctx, List<CommandSetArgument<?>> arguments) {
-        List<? extends CommandResolvedArgument<?>> resolved = arguments.stream()
+    private static Integer execute(CommandContext<CommandSourceStack> ctx, List<CommandSetArgument<?>> arguments) {
+        @SuppressWarnings("unchecked")
+        List<CommandResolvedArgument<?>> resolved = (List<CommandResolvedArgument<?>>) (List<?>) arguments.stream()
                 .map(a -> a.resolve(ctx))
                 .toList();
 
-        // TODO: output
-        ctx.getSource().sendSuccess(() -> Component.literal(resolved.toString()), true);
+        CommandSourceStack source = ctx.getSource();
+        var server = source.getServer();
 
+        new Thread(() -> {
+            try {
+                String result = CommandResolvedArgument.HANDLER.send(resolved);
+                server.execute(() -> source.sendSuccess(() -> Component.literal(result), true));
+            } catch (Exception e) {
+                server.execute(() -> source.sendFailure(Component.literal("Failed to execute command")));
+            }
+        }).start();
         return 1;
     }
 }

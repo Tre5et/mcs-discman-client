@@ -1,7 +1,7 @@
 package net.treset.discmanextras.rpc;
 
 import dev.treset.servermanagementextender.wrapper.ManagementSchema;
-import dev.treset.servermanagementextender.wrapper.RpcNotificationHandler;
+import dev.treset.servermanagementextender.wrapper.RpcOutgoingHandler;
 import dev.treset.servermanagementextender.wrapper.ServerManagementInitialized;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.jsonrpc.api.PlayerDto;
@@ -14,7 +14,7 @@ public record RpcDeath(PlayerDto player, RpcText message) {
             .property("message", RpcText.WRAPPER, RpcDeath::message)
             .build(RpcDeath::new);
 
-    private static final RpcNotificationHandler<RpcDeath> HANDLER = RpcNotificationHandler.builder(WRAPPER)
+    private static final RpcOutgoingHandler.RpcResponselessOutgoingHandler<RpcDeath> HANDLER = RpcOutgoingHandler.builder(WRAPPER)
             .description("Player died")
             .identifier("discman", "notification/players/death")
             .build();

@@ -17,7 +17,7 @@ public record RpcAdvancement(
         RpcText title,
         RpcText description,
         RpcText toast,
-        Integer color
+        String color
 ) {
     public static final ManagementSchema<RpcAdvancement> WRAPPER = ManagementSchema.<RpcAdvancement>builder("discman", "advancement")
             .property("player", ManagementSchema.PLAYER, RpcAdvancement::player)
@@ -26,7 +26,7 @@ public record RpcAdvancement(
             .property("title", RpcText.WRAPPER, RpcAdvancement::title)
             .property("description", RpcText.WRAPPER, RpcAdvancement::description)
             .property("toast", RpcText.WRAPPER, RpcAdvancement::toast)
-            .property("color", ManagementSchema.INTEGER, RpcAdvancement::color)
+            .property("color", ManagementSchema.STRING, RpcAdvancement::color)
             .build(RpcAdvancement::new);
 
     private static final RpcOutgoingHandler.RpcResponselessOutgoingHandler<RpcAdvancement> HANDLER = RpcOutgoingHandler.builder(WRAPPER)
@@ -46,7 +46,7 @@ public record RpcAdvancement(
                 RpcText.of(display.getTitle()),
                 RpcText.of(display.getDescription()),
                 RpcText.of(display.getType().getDisplayName()),
-                display.getType().getChatColor().getColor()
+                display.getType().getChatColor().toString()
         );
     }
 

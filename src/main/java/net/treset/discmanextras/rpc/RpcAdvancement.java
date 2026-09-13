@@ -43,10 +43,10 @@ public record RpcAdvancement(
                 PlayerDto.from(player),
                 RpcText.of(message),
                 advancement.id().toString(),
-                RpcText.of(display.getTitle()),
-                RpcText.of(display.getDescription()),
-                RpcText.of(display.getType().getDisplayName()),
-                display.getType().getChatColor().toString()
+                RpcText.of(display.title()),
+                RpcText.of(display.description()),
+                RpcText.of(display.type().getDisplayName()),
+                display.type().getChatColor().toString()
         );
     }
 

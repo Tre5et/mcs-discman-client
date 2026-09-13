@@ -13,11 +13,9 @@ import net.minecraft.server.jsonrpc.internalapi.MinecraftApi;
 import net.minecraft.server.jsonrpc.methods.ClientInfo;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.permissions.PermissionSet;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import net.treset.discmanextras.DiscmanExtrasMod;
-import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NonNull;
 
 @ServerManagementInitialized
@@ -50,10 +48,8 @@ public record RpcCommand(
                             Vec2.ZERO,
                             DiscmanExtrasMod.getServerInstance().overworld(),
                             PermissionSet.ALL_PERMISSIONS,
-                            "Discman",
                             Component.literal("Discman"),
-                            DiscmanExtrasMod.getServerInstance(),
-                            null
+                            DiscmanExtrasMod.getServerInstance()
                     )
             );
         } catch (CommandSyntaxException e) {
@@ -131,8 +127,8 @@ public record RpcCommand(
     private static class DiscmanCommandSource extends CommandSourceStack {
         private final DiscmanCommandOutput output;
 
-        public DiscmanCommandSource(DiscmanCommandOutput output, Vec3 pos, Vec2 rot, ServerLevel world, PermissionSet permission, String name, Component displayName, MinecraftServer server, @Nullable Entity entity) {
-            super(output, pos, rot, world, permission, name, displayName, server, entity);
+        public DiscmanCommandSource(DiscmanCommandOutput output, Vec3 pos, Vec2 rot, ServerLevel world, PermissionSet permission, Component name, MinecraftServer server) {
+            super(output, pos, rot, world, permission, name, server);
             this.output = output;
         }
 
